@@ -25,4 +25,8 @@ public class ClassCache {
 	public static void add(String className, ClassModel model) {
 		entries.put(className, model);
 	}
+
+	public static void clear() {
+		entries.clear();
+	}
 }

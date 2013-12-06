@@ -14,10 +14,10 @@ import yooze.scanner.Scanner;
 import yooze.scanner.TgzScanner;
 
 /**
- * Builds a class dependency graph from given classpath. Delegates to ClassModelBuilder.
+ * Builds a class dependency graph from given classpath. Delegates to
+ * ClassModelBuilder.
  */
 public class GraphBuilder {
-
 	private Scanner scanner;
 	private ClassModelBuilder classModelBuilder;
 	private String[] packageIncludePatterns;
@@ -40,29 +40,40 @@ public class GraphBuilder {
 	}
 
 	/**
-	 * Factory method for getting a builder that scans a lib directory (containing jars)
+	 * Factory method for getting a builder that scans a lib directory
+	 * (containing jars)
 	 */
 	public static GraphBuilder getLibDirectoryBuilder() {
 		return new GraphBuilder(new LibScanner());
 	}
 
 	/**
-	 * Factory method for getting a builder that scans a directory containing classes
+	 * Factory method for getting a builder that scans a directory containing
+	 * classes
 	 */
 	public static GraphBuilder getClassesDirectoryBuilder() {
 		return new GraphBuilder(new ClassesDirScanner());
 	}
 
 	private GraphBuilder(Scanner scanner) {
-		super();
 		this.scanner = scanner;
 	}
 
-	public Graph build(String archive) throws IOException {
-		return buildClassDepencyGraph(new File(archive));
+	/**
+	 * primary function for this class.
+	 * 
+	 * @param archiveFilename
+	 * @return a Graph containing all calculated dependencies
+	 * @throws IOException
+	 *             when file reading fails
+	 */
+	public Graph build(String archiveFilename, String className)
+			throws IOException {
+		return buildClassDepencyGraph(new File(archiveFilename), className);
 	}
 
-	public Graph buildClassDepencyGraph(File archiveFile) throws IOException {
+	Graph buildClassDepencyGraph(File archiveFile, String className)
+			throws IOException {
 		List<ClassPath> cpList = scanner.scanArchive(archiveFile);
 
 		ClassPool pool = ClassPool.getDefault();
@@ -70,12 +81,13 @@ public class GraphBuilder {
 			pool.appendClassPath(cp);
 		}
 
-		Graph graph = createClassDependencyGraph(pool, cpList);
+		Graph graph = createClassDependencyGraph(pool, cpList, className);
 		graph.setName(archiveFile.getName());
 		return graph;
 	}
 
-	private Graph createClassDependencyGraph(ClassPool pool, List<ClassPath> classpath) {
+	private Graph createClassDependencyGraph(ClassPool pool,
+			List<ClassPath> classpath, String className) {
 		Graph graph = new Graph();
 		classModelBuilder = new ClassModelBuilder(pool);
 		classModelBuilder.setPackageExcludePatterns(packageExcludePatterns);
@@ -84,10 +96,13 @@ public class GraphBuilder {
 			assert (lib instanceof Inspectable);
 
 			List<String> classes = ((Inspectable) lib).getClasses();
-			for (String className : classes) {
-				ClassModel newModel = classModelBuilder.scanClassOrSkip(className);
-				if (newModel != null) {
-					graph.add(newModel);
+			for (String name : classes) {
+				if (name.equals(className)) {
+					ClassModel newModel = classModelBuilder
+							.scanClassOrSkip(className);
+					if (newModel != null) {
+						graph.add(newModel);
+					}
 				}
 			}
 		}

@@ -14,18 +14,21 @@ import yooze.domain.Graph;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:applicationContext-test.xml")
 public class LargePackageTest {
-	
+
 	@Autowired
 	private Config config;
-	
+
 	@Test
-	public void largePackage() throws IOException{
+	public void largePackage() throws IOException {
 		GraphBuilder earBuilder = GraphBuilder.getEarBuilder();
 		earBuilder.setPackageIncludePatterns("");
 		earBuilder.setPackageExcludePatterns("java.*");
-		Graph graph = earBuilder.buildClassDepencyGraph(config.getEarFile());
-		new DotPrinter(new FileOutputStream("/tmp/example.dot")).print(graph);
-		
+		Graph graph = earBuilder.buildClassDepencyGraph(config.getEarFile(),
+				"java.lang.String");
+		DotPrinter dotPrinter = new DotPrinter(new FileOutputStream(
+				"/tmp/example.dot"));
+		dotPrinter.print(graph);
+		dotPrinter.close();
 	}
 
 	public Config getConfig() {
@@ -35,6 +38,5 @@ public class LargePackageTest {
 	public void setConfig(Config config) {
 		this.config = config;
 	}
-	
-	
+
 }

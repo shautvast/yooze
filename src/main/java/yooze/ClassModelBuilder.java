@@ -21,7 +21,8 @@ import yooze.domain.MethodModel;
  * Builds a ClassModel.
  */
 public class ClassModelBuilder {
-	private static Logger log = LoggerFactory.getLogger(ClassModelBuilder.class);
+	private static Logger log = LoggerFactory
+			.getLogger(ClassModelBuilder.class);
 
 	private Pattern[] packageIncludePatterns;
 	private Pattern[] packageExcludePatterns;
@@ -54,7 +55,8 @@ public class ClassModelBuilder {
 		}
 	}
 
-	private ClassModel tryScan(String className, ClassModel model) throws NotFoundException {
+	private ClassModel tryScan(String className, ClassModel model)
+			throws NotFoundException {
 		CtClass ctClass = pool.get(className);
 		if (isScannable(ctClass)) {
 			ConstPool constPool = ctClass.getClassFile().getConstPool();
@@ -86,7 +88,8 @@ public class ClassModelBuilder {
 	private void addMethods(ClassModel containingClass, CtClass ctClass) {
 		CtMethod[] methods = ctClass.getMethods();
 		for (CtMethod method : methods) {
-			containingClass.addMethod(MethodModel.create(containingClass, method));
+			containingClass.addMethod(MethodModel.create(containingClass,
+					method));
 		}
 	}
 
@@ -116,19 +119,7 @@ public class ClassModelBuilder {
 			return true;
 		}
 
-		// if (isInnerClass(className)) {
-		// log.debug("skipping inner class {}", className);
-		// return true;
-		// }
-		//
-		// if (className.equals("java.lang.Object")) {
-		// return true;
-		// }
 		return false;
-	}
-
-	private boolean isInnerClass(String className) {
-		return className.contains("$");
 	}
 
 	private boolean isExcluded(String className) {
