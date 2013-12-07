@@ -19,10 +19,9 @@ public class MethodCallModel {
 	public MethodModel getCalledMethod() {
 		try {
 			ParameterList parameterList = ParameterList.create(methodCall.getMethod());
-			return MethodCache.getInstance().get(
-					createQualifiedMethodname(parameterList));
+			return MethodCache.getInstance().get(createQualifiedMethodname(parameterList));
 		} catch (NotFoundException e) {
-			throw new RuntimeException(e);
+			throw new MethodNotFound(e);
 		}
 	}
 

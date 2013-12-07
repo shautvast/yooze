@@ -8,14 +8,9 @@ import javassist.ClassPath;
 import javassist.ClassPool;
 import yooze.domain.ClassModel;
 import yooze.domain.Graph;
-import yooze.scanner.ArchiveScanner;
-import yooze.scanner.LibScanner;
-import yooze.scanner.Scanner;
-import yooze.scanner.TgzScanner;
 
 /**
- * Builds a class dependency graph from given classpath. Delegates to
- * ClassModelBuilder.
+ * Builds a class dependency graph from given classpath. Delegates to ClassModelBuilder.
  */
 public class GraphBuilder {
 	private Scanner scanner;
@@ -23,83 +18,67 @@ public class GraphBuilder {
 	private String[] packageIncludePatterns;
 	private String[] packageExcludePatterns;
 
-	/**
-	 * Factory method for getting a builder that does earfiles
-	 */
-	public static GraphBuilder getEarBuilder() {
-		return new GraphBuilder(new ArchiveScanner());
-	}
-
-	/**
-	 * Factory method for getting a builder that does (downloaded) .tar.gz files
-	 */
-	public static GraphBuilder getDefaultTgzBuilder() {
-		GraphBuilder tgzBuilder = new GraphBuilder(new TgzScanner());
-		tgzBuilder.setPackageExcludePatterns("java.*", "sun.*", "com.sun.*");
-		return tgzBuilder;
-	}
-
-	/**
-	 * Factory method for getting a builder that scans a lib directory
-	 * (containing jars)
-	 */
-	public static GraphBuilder getLibDirectoryBuilder() {
-		return new GraphBuilder(new LibScanner());
-	}
-
-	/**
-	 * Factory method for getting a builder that scans a directory containing
-	 * classes
-	 */
-	public static GraphBuilder getClassesDirectoryBuilder() {
-		return new GraphBuilder(new ClassesDirScanner());
-	}
-
-	private GraphBuilder(Scanner scanner) {
+	public GraphBuilder(Scanner scanner) {
 		this.scanner = scanner;
 	}
 
 	/**
-	 * primary function for this class.
+	 * Builds a graph from a give starting point(class)
+	 * 
+	 * @param archiveFilename
+	 * @param className
+	 *            the name of the class that is the starting point. Only classes referenced from here will be included.
+	 * @return a Graph containing all calculated dependencies
+	 * @throws IOException
+	 *             when file reading fails
+	 */
+	public Graph build(String archiveFilename, String className) throws IOException {
+		return buildClassDepencyGraph(new File(archiveFilename), className, new IncludeDecision() {
+			public boolean shouldIncludeClass(String name, String startingpointname) {
+				return name.equals(startingpointname);
+			}
+		});
+	}
+
+	/**
+	 * Builds a graph for all classes (all included via package patterns and not excluded)
 	 * 
 	 * @param archiveFilename
 	 * @return a Graph containing all calculated dependencies
 	 * @throws IOException
 	 *             when file reading fails
 	 */
-	public Graph build(String archiveFilename, String className)
-			throws IOException {
-		return buildClassDepencyGraph(new File(archiveFilename), className);
+	public Graph build(String archiveFilename) throws IOException {
+		return buildClassDepencyGraph(new File(archiveFilename), null, new IncludeDecision() {
+			public boolean shouldIncludeClass(String name, String startingpointname) {
+				return true;
+			}
+		});
 	}
 
-	Graph buildClassDepencyGraph(File archiveFile, String className)
-			throws IOException {
-		List<ClassPath> cpList = scanner.scanArchive(archiveFile);
+	Graph buildClassDepencyGraph(File archiveFile, String className, IncludeDecision e) throws IOException {
+		List<InspectableClasspath> cpList = scanner.scanArchive(archiveFile);
 
 		ClassPool pool = ClassPool.getDefault();
 		for (ClassPath cp : cpList) {
 			pool.appendClassPath(cp);
 		}
 
-		Graph graph = createClassDependencyGraph(pool, cpList, className);
+		Graph graph = createClassDependencyGraph(pool, cpList, className, e);
 		graph.setName(archiveFile.getName());
 		return graph;
 	}
 
-	private Graph createClassDependencyGraph(ClassPool pool,
-			List<ClassPath> classpath, String className) {
+	private Graph createClassDependencyGraph(ClassPool pool, List<InspectableClasspath> classpath, String className,
+			IncludeDecision decide) {
 		Graph graph = new Graph();
 		classModelBuilder = new ClassModelBuilder(pool);
 		classModelBuilder.setPackageExcludePatterns(packageExcludePatterns);
 		classModelBuilder.setPackageIncludePatterns(packageIncludePatterns);
-		for (ClassPath lib : classpath) {
-			assert (lib instanceof Inspectable);
-
-			List<String> classes = ((Inspectable) lib).getClasses();
-			for (String name : classes) {
-				if (name.equals(className)) {
-					ClassModel newModel = classModelBuilder
-							.scanClassOrSkip(className);
+		for (InspectableClasspath lib : classpath) {
+			for (String name : lib.getClasses()) {
+				if (decide.shouldIncludeClass(name, className)) {
+					ClassModel newModel = classModelBuilder.scanClassOrSkip(className);
 					if (newModel != null) {
 						graph.add(newModel);
 					}
@@ -117,4 +96,7 @@ public class GraphBuilder {
 		this.packageExcludePatterns = packageExcludePatterns;
 	}
 
+	interface IncludeDecision {
+		boolean shouldIncludeClass(String name, String startingpointname);
+	}
 }

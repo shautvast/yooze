@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import yooze.application.GraphBuilderFactory;
 import yooze.domain.Graph;
+import yooze.output.DotPrinter;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:applicationContext-test.xml")
@@ -20,7 +22,7 @@ public class LargePackageTest {
 
 	@Test
 	public void largePackage() throws IOException {
-		GraphBuilder earBuilder = GraphBuilder.getEarBuilder();
+		GraphBuilder earBuilder = GraphBuilderFactory.getEarBuilder();
 		earBuilder.setPackageIncludePatterns("");
 		earBuilder.setPackageExcludePatterns("java.*");
 		Graph graph = earBuilder.buildClassDepencyGraph(config.getEarFile(),

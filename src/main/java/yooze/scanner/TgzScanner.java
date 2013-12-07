@@ -11,34 +11,32 @@ import java.util.List;
 import java.util.jar.JarFile;
 import java.util.zip.GZIPInputStream;
 
-import javassist.ClassPath;
-
 import org.xeustechnologies.jtar.TarEntry;
 import org.xeustechnologies.jtar.TarInputStream;
 
-import yooze.JarClassPath;
+import yooze.InspectableClasspath;
+import yooze.Scanner;
 
 /**
  * @author sander
  * 
  */
 public class TgzScanner implements Scanner {
-	public List<ClassPath> scanArchive(String archiveName) throws IOException {
+	public List<InspectableClasspath> scanArchive(String archiveName) throws IOException {
 		return scanArchive(new File(archiveName));
 	}
 
-	public List<ClassPath> scanArchive(File file) throws IOException {
-		List<ClassPath> classpaths = new ArrayList<ClassPath>();
-		TarInputStream tarInputStream = new TarInputStream(new GZIPInputStream(
-				new BufferedInputStream(new FileInputStream(file))));
+	public List<InspectableClasspath> scanArchive(File file) throws IOException {
+		List<InspectableClasspath> classpaths = new ArrayList<InspectableClasspath>();
+		TarInputStream tarInputStream = new TarInputStream(new GZIPInputStream(new BufferedInputStream(
+				new FileInputStream(file))));
 		TarEntry entry;
 		while ((entry = tarInputStream.getNextEntry()) != null) {
 			if (entry.getName().endsWith(".jar")) {
 				int count;
 				byte data[] = new byte[2048];
 
-				File tempFile = File.createTempFile(
-						singleName(entry.getName()), ".jar");
+				File tempFile = File.createTempFile(singleName(entry.getName()), ".jar");
 				FileOutputStream fos = new FileOutputStream(tempFile);
 				BufferedOutputStream dest = new BufferedOutputStream(fos);
 

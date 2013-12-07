@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import yooze.application.GraphBuilderFactory;
 import yooze.domain.ClassModel;
 import yooze.domain.Graph;
 
@@ -23,7 +24,7 @@ public class TgzBuilderTest {
 
 	@Test
 	public void tgzBuilder() throws IOException {
-		GraphBuilder tgzBuilder = GraphBuilder.getDefaultTgzBuilder();
+		GraphBuilder tgzBuilder = GraphBuilderFactory.getDefaultTgzBuilder();
 		tgzBuilder.setPackageIncludePatterns("nl.*");
 		tgzBuilder.setPackageExcludePatterns("");
 		Graph graph = tgzBuilder.buildClassDepencyGraph(config.getTgzFile(),

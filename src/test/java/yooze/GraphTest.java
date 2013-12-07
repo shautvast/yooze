@@ -12,6 +12,7 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import yooze.application.GraphBuilderFactory;
 import yooze.domain.ClassModel;
 import yooze.domain.Graph;
 
@@ -28,7 +29,7 @@ public class GraphTest {
 	public void buildGraph() throws IOException {
 		// new Yooze("/tmp/test").createNeoGraph("target/test-classes",
 		// ".*?.Class.");
-		GraphBuilder libDirectoryBuilder = GraphBuilder
+		GraphBuilder libDirectoryBuilder = GraphBuilderFactory
 				.getClassesDirectoryBuilder();
 		libDirectoryBuilder.setPackageIncludePatterns(".*?.Class.");
 		libDirectoryBuilder.setPackageExcludePatterns("");

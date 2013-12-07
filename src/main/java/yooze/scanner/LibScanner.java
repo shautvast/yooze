@@ -6,33 +6,30 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.jar.JarFile;
 
-import yooze.JarClassPath;
-
-import javassist.ClassPath;
+import yooze.InspectableClasspath;
+import yooze.Scanner;
 
 /**
- * Scans a directory ("lib") recursively for jarfiles and adds them to the
- * classpath
- * 
- * @author sander
- * 
+ * Scans a directory ("lib") recursively for jarfiles and adds them to the classpath
  */
 public class LibScanner implements Scanner {
 
 	@Override
-	public List<ClassPath> scanArchive(String archiveName) throws IOException {
+	public List<InspectableClasspath> scanArchive(String archiveName) throws IOException {
 		return scanArchive(new File(archiveName));
 	}
 
 	@Override
-	public List<ClassPath> scanArchive(File file) throws IOException {
-		List<ClassPath> classpaths = new ArrayList<ClassPath>();
-		return doScanArchive(classpaths,file);
+	public List<InspectableClasspath> scanArchive(File file) throws IOException {
+		List<InspectableClasspath> classpaths = new ArrayList<InspectableClasspath>();
+		return doScanArchive(classpaths, file);
 	}
 
-	private List<ClassPath> doScanArchive(List<ClassPath> classpaths, File file)
+	/*
+	 * return argument classpaths for sake of recursion
+	 */
+	private List<InspectableClasspath> doScanArchive(List<InspectableClasspath> classpaths, File file)
 			throws IOException {
-
 		File[] entries = file.listFiles();
 		for (File entry : entries) {
 			if (entry.isDirectory()) {
@@ -43,5 +40,4 @@ public class LibScanner implements Scanner {
 		}
 		return classpaths;
 	}
-
 }
