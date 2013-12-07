@@ -25,10 +25,8 @@ public class LargePackageTest {
 		GraphBuilder earBuilder = GraphBuilderFactory.getEarBuilder();
 		earBuilder.setPackageIncludePatterns("");
 		earBuilder.setPackageExcludePatterns("java.*");
-		Graph graph = earBuilder.buildClassDepencyGraph(config.getEarFile(),
-				"java.lang.String");
-		DotPrinter dotPrinter = new DotPrinter(new FileOutputStream(
-				"/tmp/example.dot"));
+		Graph graph = earBuilder.build(config.getEarFile(), "java.lang.String");
+		DotPrinter dotPrinter = new DotPrinter(new FileOutputStream("/tmp/example.dot"));
 		dotPrinter.print(graph);
 		dotPrinter.close();
 	}

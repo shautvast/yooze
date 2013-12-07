@@ -40,6 +40,14 @@ public class GraphBuilder {
 		});
 	}
 
+	public Graph build(File archive, String className) throws IOException {
+		return buildClassDepencyGraph(archive, className, new IncludeDecision() {
+			public boolean shouldIncludeClass(String name, String startingpointname) {
+				return name.equals(startingpointname);
+			}
+		});
+	}
+
 	/**
 	 * Builds a graph for all classes (all included via package patterns and not excluded)
 	 * 
@@ -56,7 +64,7 @@ public class GraphBuilder {
 		});
 	}
 
-	Graph buildClassDepencyGraph(File archiveFile, String className, IncludeDecision e) throws IOException {
+	private Graph buildClassDepencyGraph(File archiveFile, String className, IncludeDecision e) throws IOException {
 		List<InspectableClasspath> cpList = scanner.scanArchive(archiveFile);
 
 		ClassPool pool = ClassPool.getDefault();

@@ -27,8 +27,7 @@ public class TgzBuilderTest {
 		GraphBuilder tgzBuilder = GraphBuilderFactory.getDefaultTgzBuilder();
 		tgzBuilder.setPackageIncludePatterns("nl.*");
 		tgzBuilder.setPackageExcludePatterns("");
-		Graph graph = tgzBuilder.buildClassDepencyGraph(config.getTgzFile(),
-				"nl.jssl.jas.Main");
+		Graph graph = tgzBuilder.build(config.getTgzFile(), "nl.jssl.jas.Main");
 
 		ArrayList<String> names = new ArrayList<String>();
 
