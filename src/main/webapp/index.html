@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.node {
+  stroke: #000;
+  stroke-width: 1.5px;
+}
+
+.link {
+  stroke: #999;
+  stroke-opacity: .6;
+}
+
+</style>
+<body>
+<script src="d3.v3.min.js"></script>
+<script>
+
+var width = 1500,
+    height = 1000;
+
+var color = d3.scale.category20();
+
+var force = d3.layout.force()
+    .charge(-350)
+    .linkDistance(150)
+    .size([width, height]);
+
+ 
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+  d3.json("graph", function(error, graph) {
+  force
+      .nodes(graph.nodes)
+      .links(graph.links)
+      .start();
+  
+ 
+  var link = svg.selectAll(".link")
+      .data(graph.links)
+    .enter().append("line")
+      .attr("class", "link")
+      .style("stroke-width", "2");
+
+  var node = svg.selectAll(".node")
+      .data(graph.nodes)
+    .enter().append("g");
+  var text=	node.append("text").text(function(d){return d.name});
+  var c=	node.append("circle")
+      .attr("class", "node")
+      .attr("r", 5)
+      .style("fill", function(d) { return color(1); })
+      .call(force.drag);
+	
+  node.append("title")
+      .text(function(d) { return d.name; });
+
+  force.on("tick", function() {
+    link.attr("x1", function(d) { return d.source.x; })
+        .attr("y1", function(d) { return d.source.y; })
+        .attr("x2", function(d) { return d.target.x; })
+        .attr("y2", function(d) { return d.target.y; });
+
+    text.attr("x", function(d) { return d.x; })
+        .attr("y", function(d) { return d.y; })
+   c.attr("cx", function(d) { return d.x; })
+        .attr("cy", function(d) { return d.y; })
+        .attr("r", "5");
+  });
+});
+
+</script>
