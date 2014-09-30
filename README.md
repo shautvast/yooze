@@ -5,5 +5,4 @@ visualizes java class dependencies
 
 =====
 
-Not a finished project yet, just poking around with javassist.
-It does build a model, and you you could pick up dot files to create pictures of the graph. It just isn't very pretty yet.
+Builds a graph of class dependencies. Included is a sample (YoozeServer), using spring-boot for a REST service and D3 to create a force-directed graoh.
