@@ -5,14 +5,14 @@ import java.io.IOException;
 
 import junit.framework.Assert;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import yooze.ClassCache;
+import yooze.ClassModelBuilder;
 import yooze.GraphBuilder;
+import yooze.InclusionDecider;
 import yooze.application.GraphBuilderFactory;
 import yooze.domain.Graph;
 
@@ -20,16 +20,15 @@ import yooze.domain.Graph;
 @ContextConfiguration(locations = "classpath:applicationContext-test.xml")
 public class DotPrinterTest {
 
-	@Before
-	public void clearClassCache() {
-		ClassCache.clear();
-	}
-
 	@Test
 	public void dotPrinting() throws IOException {
 		GraphBuilder directoryBuilder = GraphBuilderFactory.getClassesDirectoryBuilder();
-		directoryBuilder.setPackageExcludePatterns(".*?Class4");
-		directoryBuilder.setPackageIncludePatterns(".*?.Class.");
+		InclusionDecider i = new InclusionDecider();
+		i.setPackageExcludePatterns(".*?Class4");
+		i.setPackageIncludePatterns(".*?.Class.");
+		ClassModelBuilder classModelBuilder = new ClassModelBuilder();
+		classModelBuilder.setInclusionDecider(i);
+		directoryBuilder.setClassModelBuilder(classModelBuilder);
 		Graph graph = directoryBuilder.build("target/test-classes", "yooze.Class1");
 
 		ByteArrayOutputStream bytes = new ByteArrayOutputStream(500);
@@ -56,8 +55,14 @@ public class DotPrinterTest {
 	@Test
 	public void noReference() throws IOException {
 		GraphBuilder directoryBuilder = GraphBuilderFactory.getClassesDirectoryBuilder();
-		directoryBuilder.setPackageExcludePatterns("");
-		directoryBuilder.setPackageIncludePatterns("yooze.Class4");
+
+		InclusionDecider i = new InclusionDecider();
+		i.setPackageExcludePatterns("");
+		i.setPackageIncludePatterns("yooze.Class4");
+		ClassModelBuilder classModelBuilder = new ClassModelBuilder();
+		classModelBuilder.setInclusionDecider(i);
+		directoryBuilder.setClassModelBuilder(classModelBuilder);
+
 		Graph graph = directoryBuilder.build("target/test-classes", "yooze.Class4");
 		ByteArrayOutputStream bytes = new ByteArrayOutputStream(1000);
 		DotPrinter d = new DotPrinter(bytes);

@@ -3,6 +3,7 @@ package yooze.domain;
 import java.util.ArrayList;
 import java.util.List;
 
+import javassist.CtClass;
 
 /**
  * 
@@ -12,6 +13,7 @@ public class ClassModel {
 
 	final private List<ClassModel> references = new ArrayList<ClassModel>();
 	final private List<MethodModel> methods = new ArrayList<MethodModel>();
+	private CtClass classDefinition;
 
 	public ClassModel(String name) {
 		super();
@@ -59,9 +61,14 @@ public class ClassModel {
 		if (name == null) {
 			if (other.name != null)
 				return false;
-		} else if (!name.equals(other.name))
+		} else if (!name.equals(other.name)) {
 			return false;
+		}
 		return true;
+	}
+
+	public void setClass(CtClass ctClass) {
+		this.classDefinition = ctClass;
 	}
 
 }

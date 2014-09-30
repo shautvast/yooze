@@ -5,25 +5,27 @@ import java.io.IOException;
 
 import junit.framework.Assert;
 
-import org.junit.Before;
 import org.junit.Test;
 
-import yooze.ClassCache;
+import yooze.ClassModelBuilder;
 import yooze.GraphBuilder;
+import yooze.InclusionDecider;
 import yooze.application.GraphBuilderFactory;
 import yooze.domain.Graph;
 
 public class JsonPrinterTest {
-	@Before
-	public void clearClassCache() {
-		ClassCache.clear();
-	}
 
 	@Test
 	public void jsonShouldBeWellFormed() throws IOException {
 		GraphBuilder directoryBuilder = GraphBuilderFactory.getClassesDirectoryBuilder();
-		directoryBuilder.setPackageExcludePatterns(".*?Class4");
-		directoryBuilder.setPackageIncludePatterns(".*?.Class.");
+
+		InclusionDecider i = new InclusionDecider();
+		i.setPackageExcludePatterns(".*?Class4");
+		i.setPackageIncludePatterns(".*?.Class.");
+		ClassModelBuilder classModelBuilder = new ClassModelBuilder();
+		classModelBuilder.setInclusionDecider(i);
+		directoryBuilder.setClassModelBuilder(classModelBuilder);
+
 		Graph graph = directoryBuilder.build("target/test-classes", "yooze.Class1");
 
 		ByteArrayOutputStream bytes = new ByteArrayOutputStream(500);

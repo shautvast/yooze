@@ -29,4 +29,8 @@ public class MethodCache {
 	public Collection<MethodModel> getMethods() {
 		return entries.values();
 	}
+
+	public void reset() {
+		entries.clear();
+	}
 }

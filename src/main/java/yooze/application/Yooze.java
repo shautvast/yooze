@@ -2,7 +2,9 @@ package yooze.application;
 
 import java.io.IOException;
 
+import yooze.ClassModelBuilder;
 import yooze.GraphBuilder;
+import yooze.InclusionDecider;
 import yooze.domain.ClassModel;
 import yooze.domain.Graph;
 
@@ -27,8 +29,13 @@ public class Yooze {
 	public void createNeoGraph(String archive, String packageIncludePatterns, String packageExcludePatterns,
 			String startingClass) throws IOException {
 		GraphBuilder libDirectoryBuilder = GraphBuilderFactory.getLibDirectoryBuilder();
-		libDirectoryBuilder.setPackageExcludePatterns(packageExcludePatterns);
-		libDirectoryBuilder.setPackageIncludePatterns(packageIncludePatterns);
+
+		InclusionDecider i = new InclusionDecider();
+		i.setPackageExcludePatterns(packageExcludePatterns);
+		i.setPackageIncludePatterns(packageIncludePatterns);
+		ClassModelBuilder classModelBuilder = new ClassModelBuilder();
+		classModelBuilder.setInclusionDecider(i);
+		libDirectoryBuilder.setClassModelBuilder(classModelBuilder);
 
 		Graph graph = libDirectoryBuilder.build(archive, startingClass);
 

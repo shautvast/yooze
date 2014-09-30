@@ -3,3 +3,7 @@
 .settings
 *~
 target
+/.gradle/
+/bin/
+/build/
+/test-output/

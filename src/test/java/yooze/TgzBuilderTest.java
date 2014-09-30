@@ -25,8 +25,14 @@ public class TgzBuilderTest {
 	@Test
 	public void tgzBuilder() throws IOException {
 		GraphBuilder tgzBuilder = GraphBuilderFactory.getDefaultTgzBuilder();
-		tgzBuilder.setPackageIncludePatterns("nl.*");
-		tgzBuilder.setPackageExcludePatterns("");
+
+		InclusionDecider i = new InclusionDecider();
+		i.setPackageIncludePatterns("nl.*");
+		i.setPackageExcludePatterns("");
+		ClassModelBuilder classModelBuilder = new ClassModelBuilder();
+		classModelBuilder.setInclusionDecider(i);
+		tgzBuilder.setClassModelBuilder(classModelBuilder);
+
 		Graph graph = tgzBuilder.build(config.getTgzFile(), "nl.jssl.jas.Main");
 
 		ArrayList<String> names = new ArrayList<String>();

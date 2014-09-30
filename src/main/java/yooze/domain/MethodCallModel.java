@@ -2,7 +2,6 @@ package yooze.domain;
 
 import javassist.NotFoundException;
 import javassist.expr.MethodCall;
-import yooze.ClassCache;
 import yooze.MethodCache;
 
 public class MethodCallModel {
@@ -13,7 +12,8 @@ public class MethodCallModel {
 	}
 
 	public ClassModel getCalledClass() {
-		return ClassCache.get(methodCall.getClassName());
+		// return ClassCache.get(methodCall.getClassName());
+		return null;
 	}
 
 	public MethodModel getCalledMethod() {

@@ -6,6 +6,8 @@ import java.io.IOException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -15,6 +17,7 @@ import yooze.output.DotPrinter;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:applicationContext-test.xml")
+@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 public class LargePackageTest {
 
 	@Autowired
@@ -23,8 +26,14 @@ public class LargePackageTest {
 	@Test
 	public void largePackage() throws IOException {
 		GraphBuilder earBuilder = GraphBuilderFactory.getEarBuilder();
-		earBuilder.setPackageIncludePatterns("");
-		earBuilder.setPackageExcludePatterns("java.*");
+
+		InclusionDecider i = new InclusionDecider();
+		i.setPackageIncludePatterns("");
+		i.setPackageExcludePatterns("java.*");
+		ClassModelBuilder classModelBuilder = new ClassModelBuilder();
+		classModelBuilder.setInclusionDecider(i);
+		earBuilder.setClassModelBuilder(classModelBuilder);
+
 		Graph graph = earBuilder.build(config.getEarFile(), "java.lang.String");
 		DotPrinter dotPrinter = new DotPrinter(new FileOutputStream("/tmp/example.dot"));
 		dotPrinter.print(graph);

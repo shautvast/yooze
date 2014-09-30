@@ -10,13 +10,12 @@ import yooze.domain.ClassModel;
 import yooze.domain.Graph;
 
 /**
- * Builds a class dependency graph from given classpath. Delegates to ClassModelBuilder.
+ * Builds a class dependency graph from given classpath. Delegates to
+ * ClassModelBuilder.
  */
 public class GraphBuilder {
 	private Scanner scanner;
 	private ClassModelBuilder classModelBuilder;
-	private String[] packageIncludePatterns;
-	private String[] packageExcludePatterns;
 
 	public GraphBuilder(Scanner scanner) {
 		this.scanner = scanner;
@@ -27,7 +26,8 @@ public class GraphBuilder {
 	 * 
 	 * @param archiveFilename
 	 * @param className
-	 *            the name of the class that is the starting point. Only classes referenced from here will be included.
+	 *            the name of the class that is the starting point. Only classes
+	 *            referenced from here will be included.
 	 * @return a Graph containing all calculated dependencies
 	 * @throws IOException
 	 *             when file reading fails
@@ -35,7 +35,7 @@ public class GraphBuilder {
 	public Graph build(String archiveFilename, String className) throws IOException {
 		return buildClassDepencyGraph(new File(archiveFilename), className, new IncludeDecision() {
 			public boolean shouldIncludeClass(String name, String startingpointname) {
-				return name.equals(startingpointname);
+				return startingpointname == null || name.equals(startingpointname);
 			}
 		});
 	}
@@ -49,7 +49,8 @@ public class GraphBuilder {
 	}
 
 	/**
-	 * Builds a graph for all classes (all included via package patterns and not excluded)
+	 * Builds a graph for all classes (all included via package patterns and not
+	 * excluded)
 	 * 
 	 * @param archiveFilename
 	 * @return a Graph containing all calculated dependencies
@@ -80,13 +81,12 @@ public class GraphBuilder {
 	private Graph createClassDependencyGraph(ClassPool pool, List<InspectableClasspath> classpath, String className,
 			IncludeDecision decide) {
 		Graph graph = new Graph();
-		classModelBuilder = new ClassModelBuilder(pool);
-		classModelBuilder.setPackageExcludePatterns(packageExcludePatterns);
-		classModelBuilder.setPackageIncludePatterns(packageIncludePatterns);
+		classModelBuilder.setPool(pool);
+
 		for (InspectableClasspath lib : classpath) {
 			for (String name : lib.getClasses()) {
 				if (decide.shouldIncludeClass(name, className)) {
-					ClassModel newModel = classModelBuilder.scanClassOrSkip(className);
+					ClassModel newModel = classModelBuilder.scanClassOrSkip(name);
 					if (newModel != null) {
 						graph.add(newModel);
 					}
@@ -96,15 +96,11 @@ public class GraphBuilder {
 		return graph;
 	}
 
-	public void setPackageIncludePatterns(String... packageIncludePatterns) {
-		this.packageIncludePatterns = packageIncludePatterns;
-	}
-
-	public void setPackageExcludePatterns(String... packageExcludePatterns) {
-		this.packageExcludePatterns = packageExcludePatterns;
-	}
-
 	interface IncludeDecision {
 		boolean shouldIncludeClass(String name, String startingpointname);
+	}
+
+	public void setClassModelBuilder(ClassModelBuilder classModelBuilder) {
+		this.classModelBuilder = classModelBuilder;
 	}
 }

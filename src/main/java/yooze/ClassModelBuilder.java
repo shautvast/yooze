@@ -1,8 +1,6 @@
 package yooze;
 
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -23,19 +21,15 @@ import yooze.domain.MethodModel;
 public class ClassModelBuilder {
 	private static Logger log = LoggerFactory.getLogger(ClassModelBuilder.class);
 
-	private Pattern[] packageIncludePatterns;
-	private Pattern[] packageExcludePatterns;
 	private ClassPool pool;
-
-	public ClassModelBuilder(ClassPool pool) {
-		this.pool = pool;
-	}
+	private InclusionDecider inclusionDecider;
+	private ClassCache classCache;
 
 	public ClassModel scanClassOrSkip(String className) {
-		if (shouldSkip(className))
+		if (inclusionDecider.shouldSkip(className))
 			return null;
-		if (ClassCache.contains(className)) {
-			return ClassCache.get(className);
+		if (classCache.contains(className)) {
+			return classCache.get(className);
 		}
 		log.info("scanning {}", className);
 
@@ -45,21 +39,27 @@ public class ClassModelBuilder {
 
 	private ClassModel scan(String className) {
 		ClassModel model = new ClassModel(className);
-		ClassCache.add(className, model);
+		classCache.add(className, model);
 		return tryScan(className, model);
 	}
 
 	private ClassModel tryScan(String className, ClassModel model) {
 		CtClass ctClass = getClassFromJavassist(className);
+		model.setClass(ctClass);
 		if (isScannable(ctClass)) {
-			ConstPool constPool = ctClass.getClassFile().getConstPool();
+			try {
+				ConstPool constPool = ctClass.getClassFile().getConstPool();
 
-			addClassReferences(model, constPool);
-			addMethods(model, ctClass);
-			resolveMethodReferences();
-			return model;
+				addClassReferences(model, constPool);
+				addMethods(model, ctClass);
+				resolveMethodReferences();
+				return model;
+			} catch (Exception e) {
+				System.out.println(e.getClass().getName() + ":" + e.getMessage());
+				return null;
+			}
 		} else {
-			throw new ClassNotFound(className);
+			return null;
 		}
 	}
 
@@ -110,60 +110,15 @@ public class ClassModelBuilder {
 		}
 	}
 
-	private boolean shouldSkip(String className) {
-		if (!isIncluded(className)) {
-			log.debug("skipping {}", className);
-			return true;
-		}
-		if (isExcluded(className)) {
-			log.debug("skipping {}", className);
-			return true;
-		}
-
-		return false;
+	public void setInclusionDecider(InclusionDecider inclusionDecider) {
+		this.inclusionDecider = inclusionDecider;
 	}
 
-	private boolean isExcluded(String className) {
-		if (packageExcludePatterns != null) {
-			for (Pattern excludePattern : packageExcludePatterns) {
-				Matcher matcher = excludePattern.matcher(className);
-				if (matcher.matches()) {
-					return true;
-				}
-			}
-		}
-		return false;
+	public void setPool(ClassPool pool) {
+		this.pool = pool;
 	}
 
-	private boolean isIncluded(String className) {
-		if (packageIncludePatterns != null) {
-			for (Pattern includePattern : packageIncludePatterns) {
-				Matcher matcher = includePattern.matcher(className);
-				if (matcher.matches()) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	public void setPackageIncludePatterns(String... packageIncludePatterns) {
-		if (packageIncludePatterns != null) {
-			this.packageIncludePatterns = new Pattern[packageIncludePatterns.length];
-			int i = 0;
-			for (String pattern : packageIncludePatterns) {
-				this.packageIncludePatterns[i++] = Pattern.compile(pattern);
-			}
-		}
-	}
-
-	public void setPackageExcludePatterns(String... packageExcludePatterns) {
-		if (packageExcludePatterns != null) {
-			this.packageExcludePatterns = new Pattern[packageExcludePatterns.length];
-			int i = 0;
-			for (String pattern : packageExcludePatterns) {
-				this.packageExcludePatterns[i++] = Pattern.compile(pattern);
-			}
-		}
+	public void setClassCache(ClassCache classCache) {
+		this.classCache = classCache;
 	}
 }

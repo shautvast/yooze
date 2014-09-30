@@ -3,6 +3,7 @@ package yooze.application;
 import yooze.GraphBuilder;
 import yooze.scanner.ArchiveScanner;
 import yooze.scanner.ClassesDirScanner;
+import yooze.scanner.JarScanner;
 import yooze.scanner.LibScanner;
 import yooze.scanner.TgzScanner;
 import yooze.scanner.WarScanner;
@@ -20,21 +21,30 @@ public class GraphBuilderFactory {
 	 */
 	public static GraphBuilder getDefaultTgzBuilder() {
 		GraphBuilder tgzBuilder = new GraphBuilder(new TgzScanner());
-		tgzBuilder.setPackageExcludePatterns("java.*", "sun.*", "com.sun.*");
 		return tgzBuilder;
 	}
 
 	/**
-	 * Factory method for getting a builder that scans a lib directory (containing jars)
+	 * Factory method for getting a builder that scans a lib directory
+	 * (containing jars)
 	 */
 	public static GraphBuilder getLibDirectoryBuilder() {
 		return new GraphBuilder(new LibScanner());
 	}
 
 	/**
-	 * Factory method for getting a builder that scans a directory containing classes
+	 * Factory method for getting a builder that scans a directory containing
+	 * classes
 	 */
 	public static GraphBuilder getClassesDirectoryBuilder() {
 		return new GraphBuilder(new ClassesDirScanner());
+	}
+
+	/**
+	 * Factory method for getting a builder that scans a directory containing
+	 * classes
+	 */
+	public static GraphBuilder getJarBuilder() {
+		return new GraphBuilder(new JarScanner());
 	}
 }
