@@ -110,8 +110,8 @@ public class YoozeServer {
 	@PostConstruct
 	public void startup() throws IOException {
 		InclusionDecider i = new InclusionDecider();
-		i.setPackageExcludePatterns("java\\.", ".*Regelkosten", "org\\.", "dao", "\\$");
-		i.setPackageIncludePatterns("Service$", "ServiceImpl$", "ServiceBean$", "Handelingen$");
+		i.setPackageExcludePatterns("java\\.");
+		i.setPackageIncludePatterns("org");
 		GraphBuilder directoryBuilder = GraphBuilderFactory.getJarBuilder();
 		classCache = new ClassCache();
 		classCache.setInclusionDecider(i);
@@ -120,7 +120,7 @@ public class YoozeServer {
 		directoryBuilder.setClassModelBuilder(classModelBuilder);
 
 		classModelBuilder.setInclusionDecider(i);
-		raw = directoryBuilder.build("src/test/resources/trc-common-core-1.0.jar", null);
+		raw = directoryBuilder.build("src/test/resources/commons-io-1.4.jar", null);
 
 	}
 
