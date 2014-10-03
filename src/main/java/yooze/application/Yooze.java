@@ -33,8 +33,7 @@ public class Yooze {
 		InclusionDecider i = new InclusionDecider();
 		i.setPackageExcludePatterns(packageExcludePatterns);
 		i.setPackageIncludePatterns(packageIncludePatterns);
-		ClassModelBuilder classModelBuilder = new ClassModelBuilder();
-		classModelBuilder.setInclusionDecider(i);
+		ClassModelBuilder classModelBuilder = new ClassModelBuilder(i);
 		libDirectoryBuilder.setClassModelBuilder(classModelBuilder);
 
 		Graph graph = libDirectoryBuilder.build(archive, startingClass);

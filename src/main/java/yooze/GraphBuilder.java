@@ -75,6 +75,12 @@ public class GraphBuilder {
 
 		Graph graph = createClassDependencyGraph(pool, cpList, className, e);
 		graph.setName(archiveFile.getName());
+
+		// leave ClassPool in original state, because getDefault will always
+		// return the same instance
+		for (ClassPath cp : cpList) {
+			pool.removeClassPath(cp);
+		}
 		return graph;
 	}
 

@@ -6,9 +6,6 @@ import java.io.IOException;
 import junit.framework.Assert;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import yooze.ClassModelBuilder;
 import yooze.GraphBuilder;
@@ -16,8 +13,6 @@ import yooze.InclusionDecider;
 import yooze.application.GraphBuilderFactory;
 import yooze.domain.Graph;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "classpath:applicationContext-test.xml")
 public class DotPrinterTest {
 
 	@Test
@@ -26,8 +21,7 @@ public class DotPrinterTest {
 		InclusionDecider i = new InclusionDecider();
 		i.setPackageExcludePatterns(".*?Class4");
 		i.setPackageIncludePatterns(".*?.Class.");
-		ClassModelBuilder classModelBuilder = new ClassModelBuilder();
-		classModelBuilder.setInclusionDecider(i);
+		ClassModelBuilder classModelBuilder = new ClassModelBuilder(i);
 		directoryBuilder.setClassModelBuilder(classModelBuilder);
 		Graph graph = directoryBuilder.build("target/test-classes", "yooze.Class1");
 
@@ -57,10 +51,8 @@ public class DotPrinterTest {
 		GraphBuilder directoryBuilder = GraphBuilderFactory.getClassesDirectoryBuilder();
 
 		InclusionDecider i = new InclusionDecider();
-		i.setPackageExcludePatterns("");
 		i.setPackageIncludePatterns("yooze.Class4");
-		ClassModelBuilder classModelBuilder = new ClassModelBuilder();
-		classModelBuilder.setInclusionDecider(i);
+		ClassModelBuilder classModelBuilder = new ClassModelBuilder(i);
 		directoryBuilder.setClassModelBuilder(classModelBuilder);
 
 		Graph graph = directoryBuilder.build("target/test-classes", "yooze.Class4");

@@ -10,6 +10,11 @@ import yooze.domain.ClassModel;
 public class ClassCache {
 	private final Map<String, ClassModel> entries = new ConcurrentHashMap<String, ClassModel>();
 	private InclusionDecider inclusionDecider;
+	private final static ClassCache instance = new ClassCache();
+
+	private ClassCache() {
+
+	}
 
 	public boolean contains(String classname) {
 		return entries.containsKey(classname);
@@ -45,6 +50,10 @@ public class ClassCache {
 
 	public void setInclusionDecider(InclusionDecider inclusionDecider) {
 		this.inclusionDecider = inclusionDecider;
+	}
+
+	public static ClassCache getInstance() {
+		return instance;
 	}
 
 }

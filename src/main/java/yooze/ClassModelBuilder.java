@@ -22,8 +22,14 @@ public class ClassModelBuilder {
 	private static Logger log = LoggerFactory.getLogger(ClassModelBuilder.class);
 
 	private ClassPool pool;
-	private InclusionDecider inclusionDecider;
+	private final InclusionDecider inclusionDecider;
 	private ClassCache classCache;
+
+	public ClassModelBuilder(InclusionDecider inclusionDecider) {
+		this.inclusionDecider = inclusionDecider;
+		classCache = ClassCache.getInstance();
+		classCache.setInclusionDecider(inclusionDecider);
+	}
 
 	public ClassModel scanClassOrSkip(String className) {
 		if (inclusionDecider.shouldSkip(className))
@@ -55,6 +61,7 @@ public class ClassModelBuilder {
 				resolveMethodReferences();
 				return model;
 			} catch (Exception e) {
+				e.printStackTrace();
 				System.out.println(e.getClass().getName() + ":" + e.getMessage());
 				return null;
 			}
@@ -110,15 +117,8 @@ public class ClassModelBuilder {
 		}
 	}
 
-	public void setInclusionDecider(InclusionDecider inclusionDecider) {
-		this.inclusionDecider = inclusionDecider;
-	}
-
 	public void setPool(ClassPool pool) {
 		this.pool = pool;
 	}
 
-	public void setClassCache(ClassCache classCache) {
-		this.classCache = classCache;
-	}
 }

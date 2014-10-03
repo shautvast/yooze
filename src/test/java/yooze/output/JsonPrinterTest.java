@@ -22,8 +22,7 @@ public class JsonPrinterTest {
 		InclusionDecider i = new InclusionDecider();
 		i.setPackageExcludePatterns(".*?Class4");
 		i.setPackageIncludePatterns(".*?.Class.");
-		ClassModelBuilder classModelBuilder = new ClassModelBuilder();
-		classModelBuilder.setInclusionDecider(i);
+		ClassModelBuilder classModelBuilder = new ClassModelBuilder(i);
 		directoryBuilder.setClassModelBuilder(classModelBuilder);
 
 		Graph graph = directoryBuilder.build("target/test-classes", "yooze.Class1");

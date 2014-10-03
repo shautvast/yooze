@@ -6,34 +6,25 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.core.io.DefaultResourceLoader;
 
 import yooze.application.GraphBuilderFactory;
 import yooze.domain.ClassModel;
 import yooze.domain.Graph;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "classpath:applicationContext-test.xml")
 public class TgzBuilderTest {
-
-	@Autowired
-	private Config config;
 
 	@Test
 	public void tgzBuilder() throws IOException {
 		GraphBuilder tgzBuilder = GraphBuilderFactory.getDefaultTgzBuilder();
 
 		InclusionDecider i = new InclusionDecider();
-		i.setPackageIncludePatterns("nl.*");
-		i.setPackageExcludePatterns("");
-		ClassModelBuilder classModelBuilder = new ClassModelBuilder();
-		classModelBuilder.setInclusionDecider(i);
+		i.setPackageIncludePatterns("nl\\.");
+		ClassModelBuilder classModelBuilder = new ClassModelBuilder(i);
 		tgzBuilder.setClassModelBuilder(classModelBuilder);
 
-		Graph graph = tgzBuilder.build(config.getTgzFile(), "nl.jssl.jas.Main");
+		Graph graph = tgzBuilder.build(new DefaultResourceLoader().getResource("classpath:agent.tar.gz").getFile(),
+				"nl.jssl.jas.Main");
 
 		ArrayList<String> names = new ArrayList<String>();
 
@@ -43,7 +34,4 @@ public class TgzBuilderTest {
 		assertTrue(names.contains("nl.jssl.jas.Main"));
 	}
 
-	public void setConfig(Config config) {
-		this.config = config;
-	}
 }

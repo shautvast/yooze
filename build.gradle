@@ -46,3 +46,6 @@ dependencies{
 		testCompile 'javax.annotation:jsr250-api:1.0'
 }
 
+springBoot {
+    mainClass = "yooze.application.YoozeServer"
+}

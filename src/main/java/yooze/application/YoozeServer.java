@@ -109,17 +109,15 @@ public class YoozeServer {
 
 	@PostConstruct
 	public void startup() throws IOException {
-		InclusionDecider i = new InclusionDecider();
-		i.setPackageExcludePatterns("java\\.");
-		i.setPackageIncludePatterns("org");
+		InclusionDecider inclusionDecider = new InclusionDecider();
+		inclusionDecider.setPackageExcludePatterns("java\\.");
+		inclusionDecider.setPackageIncludePatterns("org");
 		GraphBuilder directoryBuilder = GraphBuilderFactory.getJarBuilder();
-		classCache = new ClassCache();
-		classCache.setInclusionDecider(i);
-		ClassModelBuilder classModelBuilder = new ClassModelBuilder();
-		classModelBuilder.setClassCache(classCache);
+		classCache = ClassCache.getInstance();
+		classCache.setInclusionDecider(inclusionDecider);
+		ClassModelBuilder classModelBuilder = new ClassModelBuilder(inclusionDecider);
 		directoryBuilder.setClassModelBuilder(classModelBuilder);
 
-		classModelBuilder.setInclusionDecider(i);
 		raw = directoryBuilder.build("src/test/resources/commons-io-1.4.jar", null);
 
 	}

@@ -13,7 +13,7 @@ public class LibScannerTest {
 	@Test
 	public void directoryWithoutJars_isNotAClasspathEntry() throws IOException {
 		LibScanner libScanner = new LibScanner();
-		List<InspectableClasspath> classpathList = libScanner.scanArchive("src");
+		List<InspectableClasspath> classpathList = libScanner.scanArchive("src/main");
 		assertTrue("This should be empty", classpathList.isEmpty());
 	}
 }

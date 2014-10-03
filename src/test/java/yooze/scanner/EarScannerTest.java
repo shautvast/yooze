@@ -8,24 +8,16 @@ import java.io.IOException;
 import java.util.List;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.core.io.DefaultResourceLoader;
 
-import yooze.Config;
 import yooze.InspectableClasspath;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "classpath:applicationContext-test.xml")
 public class EarScannerTest {
-
-	@Autowired
-	private Config config;
 
 	@Test
 	public void scanner() throws IOException {
-		List<InspectableClasspath> classpaths = new ArchiveScanner(new WarScanner()).scanArchive(config.getEarFile());
+		List<InspectableClasspath> classpaths = new ArchiveScanner(new WarScanner())
+				.scanArchive(new DefaultResourceLoader().getResource("classpath:examples.ear").getFile());
 		for (InspectableClasspath path : classpaths) {
 			if (path instanceof DirClassPath) {
 				List<String> classes = ((InspectableClasspath) path).getClasses();
@@ -40,9 +32,4 @@ public class EarScannerTest {
 			}
 		}
 	}
-
-	public void setConfig(Config config) {
-		this.config = config;
-	}
-
 }
